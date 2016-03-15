@@ -1,0 +1,16 @@
+{
+  "name": "marketo-dupe-checker",
+  "version": "1.0.0",
+  "description": "Marketo duplicate checker proof of concept",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Tim Ripley",
+  "license": "ISC",
+  "dependencies": {
+    "email-verify": "0.0.18",
+    "request": "^2.69.0",
+    "restify": "^4.0.4"
+  }
+}
