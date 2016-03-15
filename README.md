@@ -1,5 +1,5 @@
 # marketo-dupe-checker
-### Hacked together HTTP endpoint for duplicate checking in Marketo. Might work.
+##### Hacked together HTTP endpoint for duplicate checking in Marketo. Might work.
 >
 > Hasn't been tested at all and doesn't do any error handling.
 > 
