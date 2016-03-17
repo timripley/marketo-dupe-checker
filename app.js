@@ -10,20 +10,8 @@ const util = require('util')
 const restify = require('restify');
 const request = require('request');
 
-var marketoInstance = ""
-var accessToken = ""
-var requestURL = "http://www.json-generator.com/api/json/get/bVshkCxSmq?indent=2&fakequery=" 
-
-/*
-
-# 2 pseudo endpoints
-
-DUPE TRUE = http://www.json-generator.com/api/json/get/bVshkCxSmq?indent=2&fakequery=
-DUPE FALSE = http://www.json-generator.com/api/json/get/bMSaqvLJIO?indent=2&fakequery=
-
-### requestURL will need to be changed in production to - 'https://' + marketoInstance +'.mktorest.com/rest/v1/leads.json?access_token=' + accessToken + '&filterType=email&filterValues='
-
-*/
+var accessURL = "" // URL you'd use to generate access tokens - http://developers.marketo.com/documentation/rest/authentication/
+var marketoInstance = "AAA-BBB-123"
 
 
 // Listen for a request on port 8080
@@ -37,9 +25,24 @@ server.get("/verify/:email", respond);
 
 // Service to check for duplicates in Marketo
 function respond(req, res, next) {
-  function makeRequest( callback ){
-    request(requestURL + req.params.email, function (error, response, body) {
+
+  function getToken( callback ){
+    request(accessURL, function (error, response, body) {
       if (!error && response.statusCode == 200) {
+        console.log( "getToken body: " + body )
+        var e = JSON.parse(body)
+        accessToken = e.access_token
+        callback && callback();
+      }
+    })
+    util.log( "Request for email: " + req.params.email )
+  }
+
+  function makeRequest( callback ){
+    request('https://' + marketoInstance + '.mktorest.com/rest/v1/leads.json?access_token=' + accessToken + '&filterType=email&filterValues=' + req.params.email, function (error, response, body) {
+      if (!error && response.statusCode == 200) {
+        console.log("makeRequest accessToken:" + accessToken)
+        console.log("makeRequest body: " + body);
         data = JSON.parse(body)
         callback && callback();
       }
@@ -58,10 +61,12 @@ function respond(req, res, next) {
     res.send({"email": req.params.email,"duplicate":dupe});
     next();
   }
-   
-  makeRequest( function(){
-    checkDuplicate( function(){
-      sendResponse();
+  
+  getToken( function(){
+    makeRequest( function(){
+      checkDuplicate( function(){
+        sendResponse();
+      });
     });
   });
 }
